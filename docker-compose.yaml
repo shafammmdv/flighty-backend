@@ -1,0 +1,113 @@
+version: '3.1'
+
+services:
+
+  config-server:
+    build:
+      context: flighty-config-server
+      dockerfile: ./Dockerfile
+    image: config-server:latest
+    networks:
+        - flighty-services
+    environment:
+      SERVER_PORT: 8888
+    ports:
+      - "8888:8888"
+    depends_on:
+      - service-discovery
+
+  api-gateway:
+    build:
+      context: flighty-api-gateway
+      dockerfile: ./Dockerfile
+    image: api-gateway:latest
+    networks:
+      - flighty-services
+    environment:
+      SERVER_PORT: 8081
+      CONFIG_SERVER_URL: http://config-server:8888
+    ports:
+      - "8081:8081"
+
+
+
+  service-discovery:
+    build:
+      context: flighty-service-discovery
+      dockerfile: ./Dockerfile
+    image: service-discovery:latest
+    networks:
+      - flighty-services
+    environment:
+      SERVER_PORT: 8761
+      CONFIG_SERVER_URL: http://config-server:8888
+    ports:
+      - "8761:8761"
+
+
+  auth-ms:
+    build:
+      context: flighty-auth-ms
+      dockerfile: ./Dockerfile
+    image: auth-ms:latest
+    environment:
+      CONFIG_SERVER_URL: http://config-server:8888
+    networks:
+      - flighty-services
+    depends_on:
+      - service-discovery
+
+  ms-booking:
+    build:
+      context: ms-booking
+      dockerfile: ./Dockerfile
+    image: ms-booking:latest
+    environment:
+      CONFIG_SERVER_URL: http://config-server:8888
+    networks:
+      - flighty-services
+    depends_on:
+      - service-discovery
+
+  ms-excel-adapter:
+    build:
+      context: ms-excel-adapter
+      dockerfile: ./Dockerfile
+    image: ms-excel-adapter:latest
+    environment:
+      CONFIG_SERVER_URL: http://config-server:8888
+    networks:
+      - flighty-services
+    depends_on:
+      - service-discovery
+
+  ms-user:
+    build:
+      context: ms-user
+      dockerfile: ./Dockerfile
+    image: ms-user:latest
+    environment:
+      CONFIG_SERVER_URL: http://config-server:8888
+    networks:
+      - flighty-services
+    depends_on:
+      - service-discovery
+
+  ms-flight:
+    build:
+      context: ms-flight
+      dockerfile: ./Dockerfile
+    image: ms-flight:latest
+    environment:
+      CONFIG_SERVER_URL: http://config-server:8888
+    networks:
+      - flighty-services
+    depends_on:
+      - service-discovery
+
+networks:
+  flighty-services:
+    name: flighty-services
+    driver: bridge
+
+
