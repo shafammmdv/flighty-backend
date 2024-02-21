@@ -1,4 +1,4 @@
-Developed in 02.2023
+**Developed in 01.2023 - 02.2023**
 # Overview
 
 Spring Cloud based microservice application.
